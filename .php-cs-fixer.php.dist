@@ -2,6 +2,7 @@
 
 return (new PhpCsFixer\Config())
     ->setUsingCache(false)
+    ->setRiskyAllowed(true)
     ->setRules([
         '@PSR12' => true,
         'ordered_imports' => [

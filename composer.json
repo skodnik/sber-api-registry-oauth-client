@@ -44,7 +44,7 @@
     "tests-unit": "vendor/bin/phpunit  --filter Unit",
     "tests-feature": "vendor/bin/phpunit  --filter Feature",
     "tests-integration": "vendor/bin/phpunit  --filter Integration",
-    "csfix-dry": "vendor/bin/php-cs-fixer fix --allow-risky=yes --dry-run --verbose",
-    "csfix-fix": "vendor/bin/php-cs-fixer fix --allow-risky=yes --verbose"
+    "csfix-dry": "vendor/bin/php-cs-fixer fix --dry-run --verbose",
+    "csfix-fix": "vendor/bin/php-cs-fixer fix --verbose"
   }
 }
