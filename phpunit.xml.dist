@@ -5,6 +5,7 @@
          colors="true"
          testdox="true"
          verbose="true"
+         cacheResultFile="./var/cache/"
 >
     <testsuites>
         <testsuite name="Unit">

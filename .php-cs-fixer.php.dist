@@ -1,7 +1,7 @@
 <?php
 
 return (new PhpCsFixer\Config())
-    ->setUsingCache(false)
+    ->setCacheFile('./var/cache/.php-cs-fixer.cache')
     ->setRiskyAllowed(true)
     ->setRules([
         '@PSR12' => true,
