@@ -42,14 +42,15 @@ class OAuthClient
      * клиента на получение его данных.
      *
      * @see https://api.developer.sber.ru/how-to-use/token_oauth
-     * @throws Exception|GuzzleException
+     *      
+     * @throws Exception|GuzzleException|ApiException
      */
     public function getOauthToken(
         string $scope,
         string $rqUID = '',
         string $xIbmClientId = '',
         string $grantType = 'client_credentials',
-    ): OAuthTokenResponse|BasicErrorResponse {
+    ): OAuthTokenResponse {
         $resourcePath = '/oauth';
         $request = new Request('POST', $this->config->getHost() . $resourcePath);
 
@@ -76,22 +77,25 @@ class OAuthClient
 
         try {
             $response = $this->client->send($request, $requestOptions);
+
+            if ($response->getStatusCode() === 200) {
+                /** @var OAuthTokenResponse $oAuthTokenResponse */
+                $oAuthTokenResponse = $this->serializer->deserialize(
+                    data: $response->getBody()->getContents(),
+                    type: OAuthTokenResponse::class,
+                    format: JsonEncoder::FORMAT,
+                );
+
+                return $oAuthTokenResponse;
+            }
+
+            throw new ApiException(
+                message: '[' . $response->getStatusCode() . '] ' . 'Unknown response',
+                code: $response->getStatusCode(),
+            );
         } catch (RequestException $exception) {
             $this->exceptionGuard($exception);
         }
-
-        if ($response->getStatusCode() === 200) {
-            return $this->serializer->deserialize(
-                data: $response->getBody()->getContents(),
-                type: OAuthTokenResponse::class,
-                format: 'json'
-            );
-        }
-
-        throw new ApiException(
-            '[' . $response->getStatusCode() . '] ' . 'Unknown response',
-            $response->getStatusCode(),
-        );
     }
 
     /**
@@ -101,7 +105,9 @@ class OAuthClient
      * На текущий момент используется только для продукта Сбер ID.
      *
      * @see https://api.developer.sber.ru/how-to-use/token_oidc
-     * @throws Exception|GuzzleException
+     *
+     * @throws ApiException
+     * @throws GuzzleException
      */
     public function getOidcToken(
         string $scope,
@@ -111,7 +117,7 @@ class OAuthClient
         string $codeVerifier = '',
         string $xIbmClientId = '',
         string $grantType = 'authorization_code',
-    ): OAuthTokenResponse|BasicErrorResponse {
+    ): OidcTokenResponse {
         $resourcePath = '/oidc';
         $request = new Request('POST', $this->config->getHost() . $resourcePath);
 
@@ -142,22 +148,25 @@ class OAuthClient
 
         try {
             $response = $this->client->send($request, $requestOptions);
+
+            if ($response->getStatusCode() === 200) {
+                /** @var OidcTokenResponse $oidcTokenResponse */
+                $oidcTokenResponse = $this->serializer->deserialize(
+                    data: $response->getBody()->getContents(),
+                    type: OidcTokenResponse::class,
+                    format: JsonEncoder::FORMAT,
+                );
+
+                return $oidcTokenResponse;
+            }
+
+            throw new ApiException(
+                message: '[' . $response->getStatusCode() . '] ' . 'Unknown response',
+                code: $response->getStatusCode(),
+            );
         } catch (RequestException $exception) {
             $this->exceptionGuard($exception);
         }
-
-        if ($response->getStatusCode() === 200) {
-            return $this->serializer->deserialize(
-                data: $response->getBody()->getContents(),
-                type: OidcTokenResponse::class,
-                format: 'json'
-            );
-        }
-
-        throw new ApiException(
-            message: '[' . $response->getStatusCode() . '] ' . 'Unknown response',
-            code: $response->getStatusCode(),
-        );
     }
 
     /**
@@ -174,14 +183,15 @@ class OAuthClient
         ];
 
         if (key_exists($responseCode, $apiResponseCodes)) {
+            /** @var BasicErrorResponse $responseObject */
             $responseObject = $this->serializer->deserialize(
-                data: (string)$exception->getResponse()->getBody(),
+                data: (string)$exception->getResponse()?->getBody(),
                 type: $apiResponseCodes[$responseCode],
-                format: 'json'
+                format: JsonEncoder::FORMAT,
             );
 
             throw (new ApiException(
-                message: '[' . $exception->getCode() . '] ' . $exception->getResponse()->getBody(),
+                message: '[' . $exception->getCode() . '] ' . ($exception->getResponse()?->getBody() ?: 'Empty body'),
                 code: $exception->getCode(),
                 previous: $exception,
             ))->setResponseObject($responseObject);
