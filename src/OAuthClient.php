@@ -42,8 +42,8 @@ class OAuthClient
      * клиента на получение его данных.
      *
      * @see https://api.developer.sber.ru/how-to-use/token_oauth
-     *      
-     * @throws Exception|GuzzleException|ApiException
+     *
+     * @throws ApiException|GuzzleException|Exception
      */
     public function getOauthToken(
         string $scope,
@@ -59,7 +59,7 @@ class OAuthClient
                 'Content-Type' => 'application/x-www-form-urlencoded',
                 'Accept' => 'application/json',
                 'Authorization' => 'Basic ' . $this->config->getBasicAuthorizationString(),
-                'RqUID' => $rqUID ?: bin2hex(random_bytes(16)),
+                'RqUID' => $rqUID ?: self::getRqUID(),
                 'X-IBM-Client-ID' => $xIbmClientId,
             ],
             'form_params' => [
@@ -106,8 +106,7 @@ class OAuthClient
      *
      * @see https://api.developer.sber.ru/how-to-use/token_oidc
      *
-     * @throws ApiException
-     * @throws GuzzleException
+     * @throws ApiException|GuzzleException|Exception
      */
     public function getOidcToken(
         string $scope,
@@ -125,7 +124,7 @@ class OAuthClient
             'headers' => [
                 'Content-Type' => 'application/x-www-form-urlencoded',
                 'Accept' => 'application/json',
-                'RqUID' => $rqUID ?: bin2hex(random_bytes(16)),
+                'RqUID' => $rqUID ?: self::getRqUID(),
                 'X-IBM-Client-ID' => $xIbmClientId,
             ],
             'form_params' => [
@@ -202,5 +201,13 @@ class OAuthClient
             code: $exception->getCode(),
             previous: $exception,
         );
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function getRqUID(): string
+    {
+        return bin2hex(random_bytes(16));
     }
 }
