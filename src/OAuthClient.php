@@ -6,11 +6,12 @@ namespace Vlsv\SberApiRegistryOauthClient;
 
 use Exception;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
-use Throwable;
 use Vlsv\SberApiRegistryOauthClient\Exception\ApiException;
 use Vlsv\SberApiRegistryOauthClient\Model\BadRequest;
 use Vlsv\SberApiRegistryOauthClient\Model\BasicErrorResponse;
@@ -41,7 +42,7 @@ class OAuthClient
      * клиента на получение его данных.
      *
      * @see https://api.developer.sber.ru/how-to-use/token_oauth
-     * @throws Exception
+     * @throws Exception|GuzzleException
      */
     public function getOauthToken(
         string $scope,
@@ -75,8 +76,8 @@ class OAuthClient
 
         try {
             $response = $this->client->send($request, $requestOptions);
-        } catch (Throwable $exception) {
-            return $this->exceptionGuard($exception);
+        } catch (RequestException $exception) {
+            $this->exceptionGuard($exception);
         }
 
         if ($response->getStatusCode() === 200) {
@@ -100,7 +101,7 @@ class OAuthClient
      * На текущий момент используется только для продукта Сбер ID.
      *
      * @see https://api.developer.sber.ru/how-to-use/token_oidc
-     * @throws Exception
+     * @throws Exception|GuzzleException
      */
     public function getOidcToken(
         string $scope,
@@ -141,8 +142,8 @@ class OAuthClient
 
         try {
             $response = $this->client->send($request, $requestOptions);
-        } catch (Throwable $exception) {
-            return $this->exceptionGuard($exception);
+        } catch (RequestException $exception) {
+            $this->exceptionGuard($exception);
         }
 
         if ($response->getStatusCode() === 200) {
@@ -154,51 +155,42 @@ class OAuthClient
         }
 
         throw new ApiException(
-            '[' . $response->getStatusCode() . '] ' . 'Unknown response',
-            $response->getStatusCode(),
+            message: '[' . $response->getStatusCode() . '] ' . 'Unknown response',
+            code: $response->getStatusCode(),
         );
     }
 
     /**
      * @throws ApiException
      */
-    private function exceptionGuard(Throwable|Exception $exception): BasicErrorResponse
+    private function exceptionGuard(RequestException $exception): void
     {
-        if ($exception->getCode() === 400 && $exception->hasResponse()) {
-            return $this->serializer->deserialize(
-                data: (string)$exception->getResponse()->getBody(),
-                type: BadRequest::class,
-                format: 'json'
-            );
-        }
+        $responseCode = $exception->getCode();
+        $apiResponseCodes = [
+            400 => BadRequest::class,
+            401 => Unauthorized::class,
+            405 => MethodNotAllowed::class,
+            500 => InternalServerError::class,
+        ];
 
-        if ($exception->getCode() === 401 && $exception->hasResponse()) {
-            return $this->serializer->deserialize(
+        if (key_exists($responseCode, $apiResponseCodes)) {
+            $responseObject = $this->serializer->deserialize(
                 data: (string)$exception->getResponse()->getBody(),
-                type: Unauthorized::class,
+                type: $apiResponseCodes[$responseCode],
                 format: 'json'
             );
-        }
 
-        if ($exception->getCode() === 405 && $exception->hasResponse()) {
-            return $this->serializer->deserialize(
-                data: (string)$exception->getResponse()->getBody(),
-                type: MethodNotAllowed::class,
-                format: 'json'
-            );
-        }
-
-        if ($exception->getCode() === 500 && $exception->hasResponse()) {
-            return $this->serializer->deserialize(
-                data: (string)$exception->getResponse()->getBody(),
-                type: InternalServerError::class,
-                format: 'json'
-            );
+            throw (new ApiException(
+                message: '[' . $exception->getCode() . '] ' . $exception->getResponse()->getBody(),
+                code: $exception->getCode(),
+                previous: $exception,
+            ))->setResponseObject($responseObject);
         }
 
         throw new ApiException(
-            '[' . $exception->getCode() . '] ' . $exception->getMessage(),
-            $exception->getCode(),
+            message: '[' . $exception->getCode() . '] ' . $exception->getMessage(),
+            code: $exception->getCode(),
+            previous: $exception,
         );
     }
 }

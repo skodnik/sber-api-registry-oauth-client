@@ -5,25 +5,29 @@ declare(strict_types=1);
 namespace Vlsv\SberApiRegistryOauthClient\Exception;
 
 use Exception;
-use stdClass;
+use Throwable;
+use Vlsv\SberApiRegistryOauthClient\Model\BasicErrorResponse;
 
 class ApiException extends Exception
 {
-    protected stdClass|string|null $responseObject;
+    protected ?BasicErrorResponse $responseObject = null;
 
     public function __construct(
         string $message = '',
         int $code = 0,
+        ?Throwable $previous = null,
     ) {
-        parent::__construct($message, $code);
+        parent::__construct($message, $code, $previous);
     }
 
-    public function setResponseObject(string|stdClass|null $obj): void
+    public function setResponseObject(?BasicErrorResponse $object): static
     {
-        $this->responseObject = $obj;
+        $this->responseObject = $object;
+
+        return $this;
     }
 
-    public function getResponseObject(): string|stdClass|null
+    public function getResponseObject(): ?BasicErrorResponse
     {
         return $this->responseObject;
     }

@@ -45,9 +45,17 @@ $oAuthClient = new \Vlsv\SberApiRegistryOauthClient\OAuthClient($config);
 
 // OAUTH-токен
 try {
-    $result = $oAuthClient->getOauthToken(scope: 'order.create');
+    $accessToken = $oAuthClient
+        ->getOauthToken(scope: 'order.create')
+        ->getAccessToken();
+} catch (\Vlsv\SberApiRegistryOauthClient\Exception\ApiException $exception) {
+    echo $exception->getMessage();
+    
+    if ($exception->getResponseObject()) {
+        echo $exception->getResponseObject()->getMoreInformation();
+    }
 } catch (\Throwable $exception) {
-    // $exception->getMessage()
+    echo $exception->getMessage();
 }
 
 // OIDC-токен
@@ -56,15 +64,15 @@ try {
        scope: 'order.create',
        code: 'authorization_code',
        redirectUri: 'redirect_uri', 
-   );
+   )->getAccessToken();
+} catch (\Vlsv\SberApiRegistryOauthClient\Exception\ApiException $exception) {
+    echo $exception->getMessage();
+    
+    if ($exception->getResponseObject()) {
+        echo $exception->getResponseObject()->getMoreInformation();
+    }
 } catch (\Throwable $exception) {
-    // $exception->getMessage()
-}
-
-if ($result instanceof \Vlsv\SberApiRegistryOauthClient\Model\BasicErrorResponse) {
-    // Один из возможных вариантов ответа-ошибки, подробнее - $result->getMoreInformation();
-} else {
-    $accessToken = $result->getAccessToken();
+    echo $exception->getMessage();
 }
 ```
 

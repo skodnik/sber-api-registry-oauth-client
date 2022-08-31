@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Vlsv\SberApiRegistryOauthClient\Tests\Feature;
 
-use Vlsv\SberApiRegistryOauthClient\Model\BadRequest;
+use Vlsv\SberApiRegistryOauthClient\Exception\ApiException;
 use Vlsv\SberApiRegistryOauthClient\Model\Unauthorized;
 use Vlsv\SberApiRegistryOauthClient\Tests\TestCaseBase;
 
@@ -24,12 +24,28 @@ class UnauthorizedTest extends TestCaseBase
     }
 
     /** @depends test_deserializeSerialize */
-    public function test_getters(array $array)
+    public function test_getters(array $array): Unauthorized
     {
-        list($object, $unauthorized) = $array;
+        [$object, $unauthorized] = $array;
 
         self::assertEquals($object->moreInformation, $unauthorized->getMoreInformation());
         self::assertEquals($object->httpCode, $unauthorized->getHttpCode());
         self::assertEquals($object->httpMessage, $unauthorized->getHttpMessage());
+
+        return $unauthorized;
+    }
+
+    /**
+     * @depends test_getters
+     */
+    public static function test_ApiExceptionWithUnauthorized(Unauthorized $unauthorized): void
+    {
+        $exception = (new ApiException('Client Error 401 Unauthorized', 401))
+            ->setResponseObject($unauthorized);
+
+        self::assertInstanceOf(ApiException::class, $exception);
+        self::assertInstanceOf(Unauthorized::class, $exception->getResponseObject());
+        self::assertEquals('Client Error 401 Unauthorized', $exception->getMessage());
+        self::assertEquals(401, $exception->getCode());
     }
 }
