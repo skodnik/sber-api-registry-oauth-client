@@ -1,4 +1,4 @@
-name: phpunit, cs-fixer tests
+name: phplint, phpunit, cs-fixer tests
 
 on:
   push:
@@ -31,6 +31,9 @@ jobs:
 
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress
+
+      - name: Run phplint tests
+        run: composer lint
 
       - name: Run phpunit unit test suite
         run: composer tests-unit

@@ -38,15 +38,18 @@
   "require-dev": {
     "phpunit/phpunit": "^9.5",
     "friendsofphp/php-cs-fixer": "^3.8",
-    "vimeo/psalm": "^4.26"
+    "vimeo/psalm": "^4.26",
+    "overtrue/phplint": "^5.3"
   },
   "scripts": {
-    "tests": "vendor/bin/phpunit",
-    "tests-unit": "vendor/bin/phpunit  --filter Unit",
-    "tests-feature": "vendor/bin/phpunit  --filter Feature",
-    "tests-integration": "vendor/bin/phpunit  --filter Integration",
-    "csfix-dry": "vendor/bin/php-cs-fixer fix --dry-run --verbose",
-    "csfix-fix": "vendor/bin/php-cs-fixer fix --verbose",
+    "tests": "./vendor/bin/phpunit",
+    "tests-unit": "./vendor/bin/phpunit  --filter Unit",
+    "tests-feature": "./vendor/bin/phpunit  --filter Feature",
+    "tests-integration": "./vendor/bin/phpunit  --filter Integration",
+    "csfix-dry": "./vendor/bin/php-cs-fixer fix --dry-run --verbose",
+    "csfix-fix": "./vendor/bin/php-cs-fixer fix --verbose",
+    "lint": "./vendor/bin/phplint --verbose",
+    "lint-and-csfix": "./vendor/bin/phplint --verbose && ./vendor/bin/php-cs-fixer fix --dry-run --verbose",
     "psalm": "./vendor/bin/psalm --show-info=true"
   }
 }
