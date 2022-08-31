@@ -41,7 +41,8 @@ class OAuthClient
      * Используйте OAUTH-токен, если не требуется доступ к клиентским данным и не требуется согласие
      * клиента на получение его данных.
      *
-     * @see https://api.developer.sber.ru/how-to-use/token_oauth
+     * @see            https://api.developer.sber.ru/how-to-use/token_oauth
+     * @psalm-suppress InvalidReturnType
      *
      * @throws ApiException|GuzzleException|Exception
      */
@@ -104,7 +105,8 @@ class OAuthClient
      * в рамках установленных согласий клиентов.
      * На текущий момент используется только для продукта Сбер ID.
      *
-     * @see https://api.developer.sber.ru/how-to-use/token_oidc
+     * @see            https://api.developer.sber.ru/how-to-use/token_oidc
+     * @psalm-suppress InvalidReturnType
      *
      * @throws ApiException|GuzzleException|Exception
      */
