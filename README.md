@@ -60,7 +60,7 @@ try {
 
 // OIDC-токен
 try {
-    $result = $oAuthClient->getOidcToken(
+    $accessToken = $oAuthClient->getOidcToken(
        scope: 'order.create',
        code: 'authorization_code',
        redirectUri: 'redirect_uri', 
