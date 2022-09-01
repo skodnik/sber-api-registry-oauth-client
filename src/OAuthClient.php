@@ -79,21 +79,21 @@ class OAuthClient
         try {
             $response = $this->client->send($request, $requestOptions);
 
-            if ($response->getStatusCode() === 200) {
-                /** @var OAuthTokenResponse $oAuthTokenResponse */
-                $oAuthTokenResponse = $this->serializer->deserialize(
-                    data: $response->getBody()->getContents(),
-                    type: OAuthTokenResponse::class,
-                    format: JsonEncoder::FORMAT,
+            if ($response->getStatusCode() !== 200) {
+                throw new ApiException(
+                    message: '[' . $response->getStatusCode() . '] ' . 'Unknown response',
+                    code: $response->getStatusCode(),
                 );
-
-                return $oAuthTokenResponse;
             }
 
-            throw new ApiException(
-                message: '[' . $response->getStatusCode() . '] ' . 'Unknown response',
-                code: $response->getStatusCode(),
+            /** @var OAuthTokenResponse $oAuthTokenResponse */
+            $oAuthTokenResponse = $this->serializer->deserialize(
+                data: $response->getBody()->getContents(),
+                type: OAuthTokenResponse::class,
+                format: JsonEncoder::FORMAT,
             );
+
+            return $oAuthTokenResponse;
         } catch (RequestException $exception) {
             $this->exceptionGuard($exception);
         }
@@ -150,21 +150,21 @@ class OAuthClient
         try {
             $response = $this->client->send($request, $requestOptions);
 
-            if ($response->getStatusCode() === 200) {
-                /** @var OidcTokenResponse $oidcTokenResponse */
-                $oidcTokenResponse = $this->serializer->deserialize(
-                    data: $response->getBody()->getContents(),
-                    type: OidcTokenResponse::class,
-                    format: JsonEncoder::FORMAT,
+            if ($response->getStatusCode() !== 200) {
+                throw new ApiException(
+                    message: '[' . $response->getStatusCode() . '] ' . 'Unknown response',
+                    code: $response->getStatusCode(),
                 );
-
-                return $oidcTokenResponse;
             }
 
-            throw new ApiException(
-                message: '[' . $response->getStatusCode() . '] ' . 'Unknown response',
-                code: $response->getStatusCode(),
+            /** @var OidcTokenResponse $oidcTokenResponse */
+            $oidcTokenResponse = $this->serializer->deserialize(
+                data: $response->getBody()->getContents(),
+                type: OidcTokenResponse::class,
+                format: JsonEncoder::FORMAT,
             );
+
+            return $oidcTokenResponse;
         } catch (RequestException $exception) {
             $this->exceptionGuard($exception);
         }
