@@ -17,7 +17,7 @@ class OAuthTokenResponseTest extends TestCaseBase
         $oAuthTokenResponse = $this->serializer->deserialize($json, OAuthTokenResponse::class, 'json');
 
         self::assertInstanceOf(OAuthTokenResponse::class, $oAuthTokenResponse);
-        self::assertJsonStringEqualsJsonString($json, $this->serializerWithNameConverter->serialize($oAuthTokenResponse, 'json'));
+        self::assertJsonStringEqualsJsonString($json, $this->serializer->serialize($oAuthTokenResponse, 'json'));
 
         return [json_decode($json), $oAuthTokenResponse];
     }

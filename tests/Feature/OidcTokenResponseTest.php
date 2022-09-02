@@ -18,7 +18,7 @@ class OidcTokenResponseTest extends TestCaseBase
         $oidcTokenResponse = $this->serializer->deserialize($json, OidcTokenResponse::class, 'json');
 
         self::assertInstanceOf(OidcTokenResponse::class, $oidcTokenResponse);
-        self::assertJsonStringEqualsJsonString($json, $this->serializerWithNameConverter->serialize($oidcTokenResponse, 'json'));
+        self::assertJsonStringEqualsJsonString($json, $this->serializer->serialize($oidcTokenResponse, 'json'));
 
         return [json_decode($json), $oidcTokenResponse];
     }

@@ -4,12 +4,17 @@ declare(strict_types=1);
 
 namespace Vlsv\SberApiRegistryOauthClient\Model;
 
+use Symfony\Component\Serializer\Annotation\SerializedName;
+
 abstract class BasicErrorResponse
 {
+    /** @SerializedName("moreInformation") */
     private string $moreInformation;
 
+    /** @SerializedName("httpCode") */
     private int $httpCode;
 
+    /** @SerializedName("httpMessage") */
     private string $httpMessage;
 
     public function getMoreInformation(): string

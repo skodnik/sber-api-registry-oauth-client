@@ -10,9 +10,9 @@ use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Vlsv\SberApiRegistryOauthClient\Exception\ApiException;
+use Vlsv\SberApiRegistryOauthClient\Factory\SerializerFactory;
 use Vlsv\SberApiRegistryOauthClient\Model\BadRequest;
 use Vlsv\SberApiRegistryOauthClient\Model\BasicErrorResponse;
 use Vlsv\SberApiRegistryOauthClient\Model\InternalServerError;
@@ -29,10 +29,7 @@ class OAuthClient
         protected ClientConfig $config,
         protected Client $client = new Client(),
     ) {
-        $this->serializer = new Serializer(
-            normalizers: [new ObjectNormalizer()],
-            encoders: [new JsonEncoder()]
-        );
+        $this->serializer = SerializerFactory::getSerializer();
     }
 
     /**
