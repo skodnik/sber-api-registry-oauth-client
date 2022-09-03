@@ -38,8 +38,7 @@ class OAuthClient
      * Используйте OAUTH-токен, если не требуется доступ к клиентским данным и не требуется согласие
      * клиента на получение его данных.
      *
-     * @see            https://api.developer.sber.ru/how-to-use/token_oauth
-     * @psalm-suppress InvalidReturnType
+     * @see https://api.developer.sber.ru/how-to-use/token_oauth
      *
      * @throws ApiException|GuzzleException|Exception
      */
@@ -92,7 +91,7 @@ class OAuthClient
 
             return $oAuthTokenResponse;
         } catch (RequestException $exception) {
-            $this->exceptionGuard($exception);
+            throw $this->exceptionGuard($exception);
         }
     }
 
@@ -102,8 +101,7 @@ class OAuthClient
      * в рамках установленных согласий клиентов.
      * На текущий момент используется только для продукта Сбер ID.
      *
-     * @see            https://api.developer.sber.ru/how-to-use/token_oidc
-     * @psalm-suppress InvalidReturnType
+     * @see https://api.developer.sber.ru/how-to-use/token_oidc
      *
      * @throws ApiException|GuzzleException|Exception
      */
@@ -163,14 +161,11 @@ class OAuthClient
 
             return $oidcTokenResponse;
         } catch (RequestException $exception) {
-            $this->exceptionGuard($exception);
+            throw $this->exceptionGuard($exception);
         }
     }
 
-    /**
-     * @throws ApiException
-     */
-    private function exceptionGuard(RequestException $exception): void
+    private function exceptionGuard(RequestException $exception): ApiException
     {
         $responseCode = $exception->getCode();
         $apiResponseCodes = [
@@ -188,14 +183,14 @@ class OAuthClient
                 format: JsonEncoder::FORMAT,
             );
 
-            throw (new ApiException(
+            return (new ApiException(
                 message: '[' . $exception->getCode() . '] ' . ($exception->getResponse()?->getBody() ?: 'Empty body'),
                 code: $exception->getCode(),
                 previous: $exception,
             ))->setResponseObject($responseObject);
         }
 
-        throw new ApiException(
+        return new ApiException(
             message: '[' . $exception->getCode() . '] ' . $exception->getMessage(),
             code: $exception->getCode(),
             previous: $exception,
