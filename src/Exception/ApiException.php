@@ -20,6 +20,13 @@ class ApiException extends Exception
         parent::__construct($message, $code, $previous);
     }
 
+    public function setMessage(string $message): static
+    {
+        $this->message = $message;
+
+        return $this;
+    }
+
     public function setResponseObject(?BasicErrorResponse $object): static
     {
         $this->responseObject = $object;

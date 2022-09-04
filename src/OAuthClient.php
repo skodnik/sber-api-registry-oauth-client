@@ -24,6 +24,12 @@ use Vlsv\SberApiRegistryOauthClient\Model\Unauthorized;
 class OAuthClient
 {
     protected Serializer $serializer;
+    protected const API_RESPONSE_CODES = [
+        400 => BadRequest::class,
+        401 => Unauthorized::class,
+        405 => MethodNotAllowed::class,
+        500 => InternalServerError::class,
+    ];
 
     public function __construct(
         protected ClientConfig $config,
@@ -168,33 +174,26 @@ class OAuthClient
     private function exceptionGuard(RequestException $exception): ApiException
     {
         $responseCode = $exception->getCode();
-        $apiResponseCodes = [
-            400 => BadRequest::class,
-            401 => Unauthorized::class,
-            405 => MethodNotAllowed::class,
-            500 => InternalServerError::class,
-        ];
+        $apiException = new ApiException(
+            message: '[' . $responseCode . '] ' . $exception->getMessage(),
+            code: $responseCode,
+            previous: $exception
+        );
 
-        if (key_exists($responseCode, $apiResponseCodes)) {
-            /** @var BasicErrorResponse $responseObject */
-            $responseObject = $this->serializer->deserialize(
-                data: (string)$exception->getResponse()?->getBody(),
-                type: $apiResponseCodes[$responseCode],
-                format: JsonEncoder::FORMAT,
-            );
-
-            return (new ApiException(
-                message: '[' . $exception->getCode() . '] ' . ($exception->getResponse()?->getBody() ?: 'Empty body'),
-                code: $exception->getCode(),
-                previous: $exception,
-            ))->setResponseObject($responseObject);
+        if (!key_exists($responseCode, self::API_RESPONSE_CODES)) {
+            return $apiException;
         }
 
-        return new ApiException(
-            message: '[' . $exception->getCode() . '] ' . $exception->getMessage(),
-            code: $exception->getCode(),
-            previous: $exception,
+        /** @var BasicErrorResponse $responseObject */
+        $responseObject = $this->serializer->deserialize(
+            data: (string)$exception->getResponse()?->getBody(),
+            type: self::API_RESPONSE_CODES[$responseCode],
+            format: JsonEncoder::FORMAT,
         );
+
+        return $apiException
+            ->setMessage('[' . $responseCode . '] ' . ($exception->getResponse()?->getBody() ?: 'Empty body'))
+            ->setResponseObject($responseObject);
     }
 
     /**
