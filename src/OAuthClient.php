@@ -62,7 +62,7 @@ class OAuthClient
                 'Content-Type' => 'application/x-www-form-urlencoded',
                 'Accept' => 'application/json',
                 'Authorization' => 'Basic ' . $this->config->getBasicAuthorizationString(),
-                'RqUID' => $rqUID ?: self::getRqUID(),
+                'RqUID' => $rqUID ?: $this->getRqUID(),
                 'X-IBM-Client-ID' => $xIbmClientId,
             ],
             'form_params' => [
@@ -127,7 +127,7 @@ class OAuthClient
             'headers' => [
                 'Content-Type' => 'application/x-www-form-urlencoded',
                 'Accept' => 'application/json',
-                'RqUID' => $rqUID ?: self::getRqUID(),
+                'RqUID' => $rqUID ?: $this->getRqUID(),
                 'X-IBM-Client-ID' => $xIbmClientId,
             ],
             'form_params' => [
