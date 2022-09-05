@@ -146,7 +146,7 @@ class OAuthClient
      * @throws ApiException
      * @throws GuzzleException
      */
-    public function makeRequest(Request $request, array $requestOptions): ResponseInterface
+    private function makeRequest(Request $request, array $requestOptions): ResponseInterface
     {
         if ($this->config->getCertPath()) {
             $requestOptions['cert'] = [
