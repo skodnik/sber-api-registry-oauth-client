@@ -9,6 +9,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
+use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Serializer;
 use Vlsv\SberApiRegistryOauthClient\Exception\ApiException;
@@ -71,25 +72,10 @@ class OAuthClient
             ],
         ];
 
-        if ($this->config->getCertPath()) {
-            $requestOptions['cert'] = [
-                $this->config->getCertPath(),
-                $this->config->getCertPassword(),
-            ];
-        }
-
-        try {
-            $response = $this->client->send($request, $requestOptions);
-        } catch (RequestException $exception) {
-            throw $this->exceptionGuard($exception);
-        }
-
-        if ($response->getStatusCode() !== 200) {
-            throw new ApiException(
-                message: '[' . $response->getStatusCode() . '] ' . 'Unknown response',
-                code: $response->getStatusCode(),
-            );
-        }
+        $response = $this->makeRequest(
+            request: $request,
+            requestOptions: $requestOptions
+        );
 
         /** @var OAuthTokenResponse $oAuthTokenResponse */
         $oAuthTokenResponse = $this->serializer->deserialize(
@@ -141,6 +127,27 @@ class OAuthClient
             ],
         ];
 
+        $response = $this->makeRequest(
+            request: $request,
+            requestOptions: $requestOptions
+        );
+
+        /** @var OidcTokenResponse $oidcTokenResponse */
+        $oidcTokenResponse = $this->serializer->deserialize(
+            data: $response->getBody()->getContents(),
+            type: OidcTokenResponse::class,
+            format: JsonEncoder::FORMAT,
+        );
+
+        return $oidcTokenResponse;
+    }
+
+    /**
+     * @throws ApiException
+     * @throws GuzzleException
+     */
+    public function makeRequest(Request $request, array $requestOptions): ResponseInterface
+    {
         if ($this->config->getCertPath()) {
             $requestOptions['cert'] = [
                 $this->config->getCertPath(),
@@ -161,14 +168,7 @@ class OAuthClient
             );
         }
 
-        /** @var OidcTokenResponse $oidcTokenResponse */
-        $oidcTokenResponse = $this->serializer->deserialize(
-            data: $response->getBody()->getContents(),
-            type: OidcTokenResponse::class,
-            format: JsonEncoder::FORMAT,
-        );
-
-        return $oidcTokenResponse;
+        return $response;
     }
 
     private function exceptionGuard(RequestException $exception): ApiException
