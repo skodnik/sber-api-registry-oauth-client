@@ -8,7 +8,7 @@ class BasicTokenResponse
 {
     private string $accessToken;
 
-    private int $expiresIn;
+    private string $expiresIn;
 
     private string $scope;
 
@@ -28,12 +28,12 @@ class BasicTokenResponse
         return $this;
     }
 
-    public function getExpiresIn(): int
+    public function getExpiresIn(): string
     {
         return $this->expiresIn;
     }
 
-    public function setExpiresIn(int $expiresIn): BasicTokenResponse
+    public function setExpiresIn(string $expiresIn): BasicTokenResponse
     {
         $this->expiresIn = $expiresIn;
 
