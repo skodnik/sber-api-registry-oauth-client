@@ -121,8 +121,9 @@ composer tests-feature && composer tests-unit
 cp phpunit.xml.dist phpunit.xml
 ```
 
-Заполнить значения переменных `CLIENT_ID`, `CLIENT_SECRET` и остальные.
-При вызове метода получения токена указан scope SberPay QR/Плати QR.
+Заполнить переменные `CLIENT_ID`, `CLIENT_SECRET` и пр. значениями полученными при регистрации согласно
+[официальной документации](https://api.developer.sber.ru/how-to-use/consumer).
+При вызове метода получения токена указан `scope` из SberPay QR/Плати QR.
 
 ```shell
 composer tests-integration
