@@ -34,9 +34,9 @@ abstract class BasicErrorResponse
         return $this->httpCode;
     }
 
-    public function setHttpCode(int $httpCode): static
+    public function setHttpCode(string $httpCode): static
     {
-        $this->httpCode = $httpCode;
+        $this->httpCode = (int)$httpCode;
 
         return $this;
     }
