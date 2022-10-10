@@ -12,7 +12,7 @@ abstract class BasicErrorResponse
     private string $moreInformation;
 
     /** @SerializedName("httpCode") */
-    private int $httpCode;
+    private string $httpCode;
 
     /** @SerializedName("httpMessage") */
     private string $httpMessage;
@@ -29,14 +29,14 @@ abstract class BasicErrorResponse
         return $this;
     }
 
-    public function getHttpCode(): int
+    public function getHttpCode(): string
     {
         return $this->httpCode;
     }
 
     public function setHttpCode(string $httpCode): static
     {
-        $this->httpCode = (int)$httpCode;
+        $this->httpCode = $httpCode;
 
         return $this;
     }
