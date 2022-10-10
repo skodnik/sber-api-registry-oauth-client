@@ -71,7 +71,7 @@ $oAuthClient = new \Vlsv\SberApiRegistryOauthClient\OAuthClient($config);
 // OAUTH-токен
 try {
     $accessToken = $oAuthClient
-        ->getOauthToken(scope: 'order.create')
+        ->getOauthToken(scope: 'https://api.sberbank.ru/qr/order.create')
         ->getAccessToken();
 } catch (\Vlsv\SberApiRegistryOauthClient\Exception\ApiException $exception) {
     echo $exception->getMessage();
@@ -86,7 +86,7 @@ try {
 // OIDC-токен
 try {
     $accessToken = $oAuthClient->getOidcToken(
-       scope: 'order.create',
+       scope: 'https://api.sberbank.ru/qr/order.create',
        code: 'authorization_code',
        redirectUri: 'redirect_uri',
    )->getAccessToken();
