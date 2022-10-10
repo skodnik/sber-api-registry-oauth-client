@@ -22,7 +22,7 @@ class OAuthClientTest extends TestCase
 
         $oAuthClient = new OAuthClient($config);
 
-        $oAuthTokenResponse = $oAuthClient->getOauthToken(scope: 'order.create');
+        $oAuthTokenResponse = $oAuthClient->getOauthToken(scope: 'https://api.sberbank.ru/qr/order.create');
 
         self::assertInstanceOf(OAuthTokenResponse::class, $oAuthTokenResponse);
     }
